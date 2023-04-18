@@ -1,3 +1,6 @@
+# This has teo listeners you can experiment with.
+# INTERNAL for internal traffic on the Docker network
+# EXTERNAL for traffic from the Docker-host machine (`localhost`)
 version: "3"
 services:
   zookeeper:
@@ -7,17 +10,27 @@ services:
       - '2181:2181'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-  kafka:
-    image: 'bitnami/kafka:latest'
-    container_name: btn-kafka
+    networks:
+      - net1
+  kafka0:
+    image: bitnami/kafka:latest
+    container_name: kafka_server
     ports:
       - '9092:9092'
+      - '29092:29092'
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      ALLOW_PLAINTEXT_LISTENER: 'yes'
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=INTERNAL://:29092,EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka0:29092,EXTERNAL://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLED="false"
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
+    networks:
+      - net1
+networks:
+  net1:
+    driver: bridge
