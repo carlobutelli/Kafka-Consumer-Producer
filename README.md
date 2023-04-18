@@ -6,13 +6,14 @@ Producer and Consumer are built in Spring Boot 3.0.5
 ## Start the Services
 ### Apache kafka broker
 ```bash
-$ docker-compose -f kafka-zookeper_compose.yml up -d
+docker-compose -f kafka-zookeper_compose.yml up -d
 ```
 
 ### Producer and consumer services
 ```bash
-$ mvn -f consumer/ spring-boot:run 
-$ mvn -f producer/ spring-boot:run 
+export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+mvn -f consumer/ spring-boot:run 
+mvn -f producer/ spring-boot:run 
 ```
 ---
 
