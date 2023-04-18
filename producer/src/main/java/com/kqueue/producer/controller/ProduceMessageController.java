@@ -18,6 +18,11 @@ public class ProduceMessageController {
 
     private final KafkaJsonProducerService kafkaJsonProducerService;
 
+    @RequestMapping("/")
+    public String home() {
+        return "Hello from producer";
+    }
+
     @PostMapping("/send-json")
     public String sendAccountData(@RequestBody KafkaMessage kafkaMessage) {
         return kafkaJsonProducerService.sendJsonMessage(kafkaMessage);
